@@ -40,7 +40,7 @@ sns.set_theme(style="darkgrid",palette="pastel")
 '''
 
 datapath=os.getcwd()+'/'
-
+print (f'you are here:{datapath}')
 '''
 ###  info varis
 '''
@@ -48,12 +48,11 @@ datapath=os.getcwd()+'/'
 version='random_loc'#'fixed_loc'
 number_of_targets=40#40
 nBlocks=1
-#nSubs=range(21,40)
 
 
-nsubs=[6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
-#nsubs=[6,7,8,9,11,13,14,15,16,17,18,19,20,22,23,24,25]
-#nsubs=[13]
+
+nsubs=[6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]#subj 10 was removed from behavioral analysis ...
+
 
 
 
@@ -61,10 +60,6 @@ nsubs=[6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]
 '''
 ###  functions
 '''
-
-cox_params={}
-cox_params['start']=[]
-cox_params['end']=[]
 
 
 
@@ -95,17 +90,19 @@ key_list=['sub','reward','ITT','trial_dur','early_break','patch_leaving','exhaus
         'lastCR_6_patch_leaving_low','lastCR_7_patch_leaving_low',
         'lastCR_6_patch_leaving_med','lastCR_7_patch_leaving_med',
         'lastCR_6_patch_leaving_high','lastCR_7_patch_leaving_high',
-        'travel_time','n_control'
+        'travel_time','n_control','list_reward','list_gut',
+        'tot$_patch_leaving_low','tot$_patch_leaving_med','tot$_patch_leaving_high',
       ]
-          
-for key in key_list:
-   group_dataset_fmri['{0}'.format(key)]=[] 
-  
-
 
 
 '''
-helper functions 
+write keys to dict
+'''
+for key in key_list:
+   group_dataset_fmri['{0}'.format(key)]=[] 
+
+'''
+functions for data wrapping 
 '''
 
 #this func finds the correct indices 
@@ -121,7 +118,7 @@ def all_indices(value, qlist):
         return indices
     
     
-    
+#gets values based in all_indices   
 def TrialFinder(ind,dv): #ind = indices (list), dic=dic with condis for odd and even , dv = dependent variable
     dvXcondition=[]
     
@@ -142,7 +139,8 @@ def TrialFinder(ind,dv): #ind = indices (list), dic=dic with condis for odd and 
     return dvXcondition[0]
 
 '''
-function  that reads out csv/tsv file , averages across blocks and results in one dic per subj session
+function  that reads out csv/tsv file , averages across blocks, and results in one dic per subj session.
+It's a long one...
 
 '''
 
@@ -167,8 +165,26 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         blocks=[0,2,3,4,5]
     else:blocks=[0,1,2,3,4,5]
     n_control=0
+
+    
+    '''
+    these lists used to save rewards and giving-up times on a trial-by trial basis 
+    for the within-subject regressions to get slopes (see Wilke, 2006)
+    '''
+
+    search_durs=[]
+    n_targets=[]
+    n_guts=[]
+    n_targets_low=[]
+    n_targets_med=[]
+    n_targets_high=[]
+
     for n_block in blocks:#range(0,5):
         
+        '''
+        Load subjects .tsv with raw behavioral data. 
+        Contains mostly time logs of stimulus onsets / events.
+        '''
         print (f'### subject-{sub} block-0{n_block+1} ###')
 
         df=pd.read_csv(datapath +f"/human_foraging/data/beh/sub-{sub}/beh-data_sub-0{sub}_block-0{n_block}.tsv",sep='\t',error_bad_lines=False)
@@ -179,7 +195,23 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
             df['reward_prob_next_target'][ele]=literal_eval(df['reward_prob_next_target'][ele])
             df['responseTime'][ele]=literal_eval(df['responseTime'][ele])
              
-                
+        '''
+        write some lists for intermediate storage
+        
+                  °      low = 50% reward probability
+                  °      med = 75% ...
+                  °      high= 100%
+        
+                  °      ITT = intrer-target interval (SOA between to target detections)
+                  °      dur = durations
+                  °      targ_det = target detection
+                  °      sec_last = second last target detection 
+                  °      ..._last = up the seventh last target detection to plot the 
+                                    trajectory of collection rates as a function of 
+                                    target detections   
+                  °      ICR = instantaneous collection rate, that is, collected rewards per second (1 second / ITT)
+                  
+        '''
         ITT=[]
         search_dur=[]
         reward2=[]
@@ -190,16 +222,13 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         last_targ_det=[]
         count_trial=0
         euro=[]
-        
-
-        
+       
         sec_last_low=[]
         third_last_low=[]
         fourth_last_low=[]
         fifth_last_low=[]
         sixth_last_low=[]
         seventh_last_low=[]
-        
         
         sec_last_med=[]
         third_last_med=[]
@@ -217,15 +246,11 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         
         start=[]
         end=[]
-
         last_cr=[]
         start_prob=[]
-        
         tp_ex=[]
         tp=[]
         giving_up_time=[]
-        
-        #for block in range(nBlocks):
         intertarget_time=[]
         ICR=[]
 
@@ -233,16 +258,16 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         reward+=sum(df['reward'])
         nTrials=len(df['fix'])
     
-        singl_subj['nTrials'].append(len(df['fix']))
-        #group_dataset_fmri['nTrials'].append(nTrials)
-       
+        singl_subj['nTrials'].append(len(df['fix'])
         mean_travel_time=[]
        
         '''
-        number of trials is not pre-determined due to the countdown...
-        
-    
+        number of trials is not pre-determined due to the countdown... 
+        Design is unbalanced!
+       
         '''
+                                     
+                                     
         for trial in range(nTrials):
             if trial < nTrials-1:
                 travel_time=df['search'][trial+1]-(df['search'][trial]+df['search_dur_patch_leaving'][trial])
@@ -269,7 +294,14 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
                 trial_type.append(0)
                 
                 print (df['trial type'][trial])
-            else:trial_type.append(1)
+            else:
+                trial_type.append(1)
+                n_targets.append(df['reward'][trial])
+                search_durs.append(sdur)
+                if len(df['detection'][trial]) >0:
+                    n_guts.append(df['end of search'][trial]-df['detection'][trial][-1])
+                else:n_guts.append(df['end of search'][trial]-df['search'][trial])
+                
                 
             for targ in range(len(df['detection'][trial])):
               
@@ -458,15 +490,15 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         print ('sub %i'%sub)
         print (f'mean travel time = {np.mean(mean_travel_time)}')
         singl_subj['travel_time'].append(np.mean(mean_travel_time))
-        #print (last_cr)
-        #print (intertarget_time)
         n_control+=len(trial_type)-sum(trial_type)
-        #singl_subj['n_control'].append(n_control)
+        
+                                     
+        '''
+                  find conditons by indices
+        '''
         matrix=list(zip(reward2,search_time,trial_type))
         matrix2=list(zip(reward2,search_time,trial_type,start_prob))
-    
-        
-        #mk use of indices function to find number of trials for each condition
+
         patch_leaving_indis=all_indices((0,1,1),matrix)  
         early_break_indis=all_indices((0,1,0),matrix)
         forced_leaving_indis=all_indices((0,0,1),matrix)
@@ -493,6 +525,10 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         ITT_early_break=TrialFinder(early_break_indis,ITT)
         rew_early_break=TrialFinder(early_break_indis,euro)
         rew_patch_leaving=TrialFinder(patch_leaving_indis,euro)
+                                     
+        n_targets_low.append(TrialFinder(patch_leaving_indis_low,euro))
+        n_targets_med.append(TrialFinder(patch_leaving_indis_med,euro))
+        n_targets_high.append(TrialFinder(patch_leaving_indis_high,euro))
         
         
         '''
@@ -518,15 +554,9 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         tp_patch_leaving_high=TrialFinder(patch_leaving_indis_high,tp)
         
         searchdur_patch_leaving_low=TrialFinder(patch_leaving_indis_low,search_dur)
-        #print (searchdur_patch_leaving_low)
-        #searchdur_patch_leaving_low=[item for item in searchdur_patch_leaving_low if type(item)!=str]
-        #print (searchdur_patch_leaving_low)
-        
         searchdur_patch_leaving_med=TrialFinder(patch_leaving_indis_med,search_dur)
-        #searchdur_patch_leaving_med=[item for item in searchdur_patch_leaving_med if type(item)!=str]
-        
         searchdur_patch_leaving_high=TrialFinder(patch_leaving_indis_high,search_dur)
-        #searchdur_patch_leaving_high=[item for item in searchdur_patch_leaving_high if type(item)!=str]
+        
         
         last_cr_low=TrialFinder(patch_leaving_indis_low,last_cr)
         last_cr_med=TrialFinder(patch_leaving_indis_med,last_cr)
@@ -535,11 +565,10 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         
         
         '''
-        forced switch => early break 
+        forced switch = early break, i.e., trial in wich the search was interrupted automatically 
     
         '''
-        
-        
+
         giving_up_time_early_break=TrialFinder(early_break_indis,giving_up_time)
         rew_early_break=TrialFinder(early_break_indis,euro)
         ITT_early_break=TrialFinder(early_break_indis,ITT)
@@ -547,15 +576,7 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         searchdur_early_break=TrialFinder(early_break_indis,search_dur)
         last_cr_early_break=TrialFinder(early_break_indis_low,last_cr)
 
-        
-
-
-
-
-
         #add everything to the dictionary 
-    
-        
         try:
             singl_subj['trial_dur'].append(np.nanmedian(search_dur))
         except TypeError:
@@ -564,14 +585,9 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         singl_subj['patch_leaving'].append(patchleaving)
         singl_subj['early_break'].append(len(early_break_indis))
         singl_subj['reward'].append(reward)
-
-        
         singl_subj['full_search'].append(exhaustivesearch)
         singl_subj['mean_nTrials_patch_leaving'].append(len(patch_leaving_indis))
-    
-        
         singl_subj['meanTP_patch_leaving'].append(np.nanmedian(tp))
-            
         singl_subj['mean$_patch_leaving'].append(np.nanmedian(rew_patch_leaving))
         singl_subj['total$_patch_leaving'].append(sum(euro))
 
@@ -685,15 +701,12 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         
         
         
-        
-        # 'relTP_forced_switch','meanTP_forced_switch','total$_forced_switch',
-        # 'mean_ITT_forced_switch','lastITT_forced_switch'
-
-        
-
-    # for key in singl_subj:
-    #     #singl_subj[key]=list(singl_subj[key])
-       
+     
+    '''
+    now, after looping through all six runs,
+    create a dict with averaged subject data  
+    
+    '''
     avgDict={}
     for k,v in singl_subj.items():
     # v is the list of grades for student k
@@ -730,18 +743,29 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
                     avgDict[k] = np.nansum(v)
 
     #avgDict['overall_CR']=sum(all_rew)/(60*60)
-            
-    avgDict['total$_patch_leaving']=reward#/(60*60)
-    avgDict['n_control']=n_control#/(60*60)
+    '''
+    add these after averaging, to keep them pre-aggregated
+    '''                              
+    avgDict['total$_patch_leaving']=reward
+    avgDict['n_control']=n_control
+    avgDict['list_tri_dur']=search_durs
+    avgDict['list_reward']=n_targets
+    
+    avgDict['list_gut']=n_guts
+    avgDict['tot$_patch_leaving_low']=n_targets_low
+    avgDict['tot$_patch_leaving_med']=n_targets_med
+    avgDict['tot$_patch_leaving_high']=n_targets_high
     return avgDict
 
 
 '''
-run analysis
+do the wrapping for all subjects
 '''
 
 for sub in  nsubs:
-    one_sub=load_file(version,sub,nBlocks,number_of_targets,key_list)
+    one_sub=load_file(version,sub,
+                      nBlocks,number_of_targets,
+                      key_list)
     
 
     for key in key_list:    
@@ -754,9 +778,14 @@ for sub in  nsubs:
 for key in key_list:   
     if len(group_dataset_fmri[key])<1:     
         group_dataset_fmri.pop(key, 0)
-        
+
+                                     
+                                     
+                                     
 '''
-write to tsv
+      write dictionary to tsv file. 
+      Each parameter per condition is a key with n values, 
+      where n is the number of subjects.  
 
 '''
 tsv_file= datapath + f"fmri/beh-data-all_subs.tsv"
@@ -769,53 +798,10 @@ else:
          data.to_csv(f, header=False,index=False)
  
         
- 
 
 
 '''
-# =============================================================================
-#   OUTLIERS?
-# =============================================================================
-'''
-d={'sub':nsubs,'n_trial':group_dataset_fmri['mean_nTrials_patch_leaving']}
-df=pd.DataFrame(data=d)
-
-def remove_outliers(df, q=0.01):
-    #remove sub
-    filt_df=df.loc[:,df.columns !='sub']
-    
-    #get quantiles
-    low = q
-    high = 1-q
-    quant_df = filt_df.quantile([low, high])
-    
-    #filter
-    filt_df = filt_df.apply(lambda x: x[(x>quant_df.loc[low,x.name]) & 
-                                    (x < quant_df.loc[high,x.name])], axis=0)
-    #bring back sub id                            
-    filt_df = pd.concat([df.loc[:,'sub'], filt_df], axis=1)
-    #drop nan
-    #filt_df.dropna(inplace=True)
-    print ('filtered data')
-    print(filt_df['n_trial'].describe())
-    return filt_df
-
-filt_df=remove_outliers(df, q=0.01)
-
-
-
-# #outlier_reward=TrialFinder([5,16],group_dataset_fmri['total$_patch_leaving'])
-filt_df['old_n_trial']=group_dataset_fmri['mean_nTrials_patch_leaving']
-filt_df['n_trial_high']=group_dataset_fmri['mean_nTrials_patch_leaving_high']
-filt_df['n_trial_med']=group_dataset_fmri['mean_nTrials_patch_leaving_med']
-filt_df['n_trial_low']=group_dataset_fmri['mean_nTrials_patch_leaving_low']
-
-
-
-
-
-'''
-    plotting with seaborn
+    basic plotting using seaborn - more advanced plotting done with plotting.py
     
 '''
 def plotting(l1,label_y,plot_name,subs):
@@ -875,7 +861,7 @@ lst=[group_dataset_fmri['mean_trial_dur_patch_leaving_low'],
       group_dataset_fmri['mean_trial_dur_patch_leaving_med'],
       group_dataset_fmri['mean_trial_dur_patch_leaving_high']]
 
-plotting(lst,'Trial Duration in sec','TrialDur',nsubs)  
+#plotting(lst,'Trial Duration in sec','TrialDur',nsubs)  
 
 
 # ''' 
@@ -885,7 +871,7 @@ lst=[group_dataset_fmri['mean$_patch_leaving_low'],
       group_dataset_fmri['mean$_patch_leaving_med'],
       group_dataset_fmri['mean$_patch_leaving_high']]
 
-plotting(lst,'Mean Earnings in Cents per Patch','Reward',nsubs)  
+#plotting(lst,'Mean Earnings in Cents per Patch','Reward',nsubs)  
 
 ''' 
         4. Target Probability
@@ -894,7 +880,7 @@ lst=[group_dataset_fmri['meanTP_patch_leaving_low'],
       group_dataset_fmri['meanTP_patch_leaving_med'],
       group_dataset_fmri['meanTP_patch_leaving_high']]
 
-plotting(lst,'P reward at leaving','TP',nsubs) 
+#plotting(lst,'P reward at leaving','TP',nsubs) 
 
 
 # ''' 
@@ -906,12 +892,6 @@ plotting(lst,'P reward at leaving','TP',nsubs)
 
 # plotting(lst,'Mean Intertarget Time in sec','ITT',nsubs) 
 
-
-''' 
-# =============================================================================
-#         6. Collection Rate - does CR drop according to marginal value theory below average CR before patch leaving?
-# =============================================================================
-'''
 
 '''
 # # =============================================================================
