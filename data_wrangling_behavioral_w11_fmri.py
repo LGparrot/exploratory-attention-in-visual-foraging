@@ -261,11 +261,11 @@ def load_file(version,sub,nBlocks,number_of_targets,keys):
         singl_subj['nTrials'].append(len(df['fix'])
         mean_travel_time=[]
        
-        '''
-        number of trials is not pre-determined due to the countdown... 
-        Design is unbalanced!
+        #'''
+        #number of trials is not pre-determined due to the countdown... 
+        #Design is unbalanced!
        
-        '''
+        #'''
                                      
                                      
         for trial in range(nTrials):
