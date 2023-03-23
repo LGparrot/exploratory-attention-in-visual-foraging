@@ -1,10 +1,5 @@
-# exploratory-attention-in-visual-foraging
+# exploratory shifts of attention in visual foraging
 
-
-
-
-
-<img width="1435" alt="Bildschirmfoto 2023-03-17 um 14 07 40" src="https://user-images.githubusercontent.com/54903919/225941761-df911125-d44e-469a-ac7c-ea1d58f58107.png">
 
 
 
