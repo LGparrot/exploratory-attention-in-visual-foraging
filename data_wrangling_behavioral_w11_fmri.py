@@ -94,6 +94,19 @@ key_list=['sub','reward','ITT','trial_dur','early_break','patch_leaving','exhaus
         'tot$_patch_leaving_low','tot$_patch_leaving_med','tot$_patch_leaving_high',
       ]
 
+'''
+      Abbreviations:
+      
+      sub = subject     ITT = inter-target times      early_break= control condition      nTrials = number of trials
+      low = 50% reward probability condiiton    med = 75% "    "     high = 100% "  "     
+      TP = target probability relTP = relative target probaility  total$ = total earnings CR = collection rate (i.e., targets per second)
+      lastCR = CR of last target    lastCR_2 .. lastCR_7 = CR of second last target .. to 7th last target
+      trial_dur = trial duration / residence time per display     mean$ = mean reward per trial
+            
+'''
+
+
+
 
 '''
 write keys to dict
