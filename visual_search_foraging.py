@@ -89,9 +89,9 @@ logging.LogFile()
 '''
 
 wdir=os.getcwd()
-exp_folder = Path(wdir+"/Desktop/Lasse/human_foraging/")
-data_folder = Path(wdir+"/Desktop/Lasse/human_foraging/data/")
-subInfo_folder= Path(wdir+"/Desktop/Lasse/human_foraging/subjInfo/")
+exp_folder = Path(wdir+"/human_foraging/")
+data_folder = Path(wdir+"/human_foraging/data/")
+subInfo_folder= Path(wdir+"/human_foraging/subjInfo/")
 allfolders=[exp_folder,data_folder,subInfo_folder]
 
 
@@ -153,7 +153,7 @@ predefine target identity
 
 '''
 #stim_dir=Path(os.getcwd()+"/Desktop/Lasse/stimuli/")
-stim_dir=Path(os.getcwd()+"/pilots/stimuli/")
+stim_dir=Path(os.getcwd()+"/stimuli/")
 reward_image=stim_dir / "5cent.png"
 target_image=stim_dir / "circle.png"
 
