@@ -12,7 +12,7 @@ Note: written for python 3.6, tested on 3.8, psychopy is needed - https://www.ps
   2) run visual_search_foraging.py 
 
 
-#  USER GUIDE - Data wrangling & analysis of the beHavioral data  ##### 
+#  USER GUIDE - Data wrangling & analysis of the behavioral data  ##### 
 Note: written for python 3.6, runs on 3.9< with a few changes 
 
   1) data_wrangling.py                - aggregates raw behavioral data to means and calculates parameters relevant for further analysis.
