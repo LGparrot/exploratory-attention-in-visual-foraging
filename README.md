@@ -22,8 +22,10 @@ Note: written for python 3.6, runs on 3.9< with a few changes
 
 
 
-##########      PUBLICATION   #####
-L. Güldener and S. Pollmann, "Behavioral Bias for Exploration Is Associated with Enhanced Signaling in the Lateral and Medial Frontopolar Cortex," in Journal of Cognitive Neuroscience, vol. 36, no. 6, pp. 1156-1171, 1 June 2024, doi: 10.1162/jocn_a_02132.
+##########      PUBLICATIONS   #####
+
+  1) L. Güldener and S. Pollmann, "Behavioral Bias for Exploration Is Associated with Enhanced Signaling in the Lateral and Medial Frontopolar Cortex," in Journal of Cognitive     
+     Neuroscience, vol. 36, no. 6, pp. 1156-1171, 1 June 2024, doi: 10.1162/jocn_a_02132.
 
 
 
