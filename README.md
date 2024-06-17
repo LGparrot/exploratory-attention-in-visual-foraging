@@ -1,4 +1,4 @@
-##########      DATA AVAILABILITY     #####
+#DATA AVAILABILITY     
 We did not pre-register any part of the reported study procedures nor any of the conducted analyses prior to conducting the research. 
 The conditions of our ethics approval do not permit public archiving of anonymized fMRI data. 
 Readers seeking access to the data should contact the lead me (lasse.gueldener@gmail.com) 
