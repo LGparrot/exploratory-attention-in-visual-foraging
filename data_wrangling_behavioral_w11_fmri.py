@@ -9,7 +9,7 @@ from __future__ import division
 
 '''
 ###    FORAGING SFB1436 C02 - WP1.1
-###    behavioral analysis 
+###    behavioral analysis of the FMRI sample
 '''
 
 import os
