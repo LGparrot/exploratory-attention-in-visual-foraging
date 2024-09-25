@@ -3,7 +3,7 @@
 """
 Created on Thu Jun 17 10:36:09 2021
 
-@author: lasseguldener
+@author: parrot
 """
 from __future__ import division
 
