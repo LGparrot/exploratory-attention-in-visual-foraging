@@ -3,7 +3,7 @@
 """
 Created on Thu Mar 16 18:31:52 2023
 
-@author: lasseguldener
+@author: parrot
 
 
 wrangling decoding results 
