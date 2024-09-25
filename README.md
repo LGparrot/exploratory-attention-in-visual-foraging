@@ -1,11 +1,10 @@
 #  DATA AVAILABILITY     
 We did not pre-register any part of the reported study procedures nor any of the conducted analyses prior to conducting the research. 
 
-The human and animal behavioral data is deposited at OSF: 10.17605/OSF.IO/FEXGB![image](https://github.com/LGparrot/exploratory-attention-in-visual-foraging/assets/54903919/800cb46c-ea27-4201-b138-dc3d4e6ea433)
+The human and animal behavioral data is deposited at OSF: https://osf.io/fexgb/?view_only=b3b16acc786f497db13881ae5aa99b6d
 
 The conditions of our ethics approval do not permit public archiving of anonymized fMRI data. 
-Readers seeking access to the data should contact the me (lasse.gueldener@gmail.com) 
-or the local ethics committee at the Department of Psychology, University of Magdeburg.
+Readers seeking access to the data should contact the me.
 
 
 #  STIMULUS PRESENTATION
@@ -24,12 +23,5 @@ Note: written for python 3.6, runs on 3.9< with a few changes
   4) data_cleaning.py                 - function to clean data. 
 
 
-
-#  PUBLICATIONS   
-
-  1) L. Güldener and S. Pollmann, "Behavioral Bias for Exploration Is Associated with Enhanced Signaling in the Lateral and Medial Frontopolar Cortex,"
-     in Journal of Cognitive Neuroscience, vol. 36, no. 6, pp. 1156-1171, 1 June 2024, doi:10.1162/jocn_a_02132.
-     
-Note that the comparative anaylsis of behavioral rules driving exploration humans versus gerbils is currently under review.
 
   
