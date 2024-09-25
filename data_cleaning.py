@@ -3,7 +3,7 @@
 """
 Created on Thu Mar 16 14:02:03 2023
 
-@author: lasseguldener
+@author: parrot
 """
 
 
